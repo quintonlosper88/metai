@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { Calculator, Info, Download, Save, FileText } from "lucide-react";
 import { ResultComponent } from "../../General/ResultComponent";
 import { InputWithLabel } from "../../General/InputWithLabel";
 import { CalculatorHeader } from "../../General/CalculatorHeader";
 import { HydroSpotCheck } from "../../../util/HydrocycloneSpotChecks";
 const HydrocycloneSpotChecks = ({ onBack }) => {
+	const [activeVolFlow, setActiveVolFlow] = useState("feed");
 	const [inputs, setInputs] = useState({
 		oreDensity: "2.65",
-		FeedVolRate: "150",
+		feedVolRate: "150",
+		underVolRate: "0",
+		overVolRate: "0",
 		feedDensity: "1.35",
 		overflowDensity: "1.15",
-		underflowDensity: "1.55",
+		underflowDensity: "1.65",
 	});
 
 	const [results, setResults] = useState({
@@ -23,48 +26,61 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 		OFPS: null,
 		UFQP: null,
 		OFQP: null,
+		FQP: null,
 	});
 
-	const handleInputChange = (field, value) => {
-		const newInputs = {
-			...inputs,
-			[field]: value,
-		};
+    useEffect(() => {
+        const calculator = new HydroSpotCheck(
+            2.65,
+            parseFloat(inputs.feedVolRate),
+            parseFloat(inputs.feedDensity),
+            parseFloat(inputs.overflowDensity),
+            parseFloat(inputs.underflowDensity),
+            'feed'
+        );
+        setResults(calculator.Results());
+    }, []);  // Empty dependency array means this runs once on mount
 
-		// Convert input strings to numbers and validate
-		const feedDensity = parseFloat(newInputs.feedDensity);
-		const overflowDensity = parseFloat(newInputs.overflowDensity);
-		const underflowDensity = parseFloat(newInputs.underflowDensity);
-		const FeedVolRate = parseFloat(newInputs.FeedVolRate);
-		// Only calculate if we have valid numbers
-		if (
-			!isNaN(feedDensity) &&
-			!isNaN(overflowDensity) &&
-			!isNaN(underflowDensity)
-		) {
-			const calculator = new HydroSpotCheck(
-				2.65,
-				FeedVolRate,
-				feedDensity,
-				overflowDensity,
-				underflowDensity
-			);
-			console.log(calculator.Results());
-			setResults({
-				split: calculator.Results().Split,
-				FDMS: calculator.Results().FDMS,
-				UFMS: calculator.Results().UFMS,
-				OFMS: calculator.Results().OFMS,
-				FPS: calculator.Results().FPS,
-				UFPS: calculator.Results().UFPS,
-				OFPS: calculator.Results().OFPS,
-				UFQP: calculator.Results().UFQP,
-				OFQP: calculator.Results().OFQP,
-			});
-		}
+	const handleInputChange = (field, value, id) => {
+        const newInputs = {
+            ...inputs,
+            [field]: value,
+        };
 
-		setInputs(newInputs);
-	};
+        let volRateVariable = 'feed'; // default
+        let volRate = parseFloat(newInputs.feedVolRate);
+
+        if (id && id.includes('volflow')) {
+            volRateVariable = id.split('-')[0];
+            setActiveVolFlow(volRateVariable);
+
+            // Set the correct volume rate based on which input changed
+            switch(volRateVariable) {
+                case 'feed':
+                    volRate = parseFloat(newInputs.feedVolRate);
+                    break;
+                case 'underflow':
+                    volRate = parseFloat(newInputs.underVolRate);
+                    break;
+                case 'overflow':
+                    volRate = parseFloat(newInputs.overVolRate);
+                    break;
+            }
+        }
+
+        const calculator = new HydroSpotCheck(
+            2.65,
+            volRate,
+            parseFloat(newInputs.feedDensity),
+            parseFloat(newInputs.overflowDensity),
+            parseFloat(newInputs.underflowDensity),
+            volRateVariable
+        );
+
+        setResults(calculator.Results());
+        setInputs(newInputs);
+    };
+
 
 	return (
 		<div className='min-h-screen bg-secondary p-6'>
@@ -112,7 +128,7 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 								placeholder='Enter Slurry SG...'
 								name='feedDensity'
 								type='number'
-								className='mb-4'
+								className='mb-3'
 								step={0.1}
 							/>
 							<InputWithLabel
@@ -121,13 +137,17 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Volumetric Rate (m<sup>3</sup>/hr)
 									</>
 								}
-								value={inputs.FeedVolRate}
+								value={
+									activeVolFlow === "feed" ? inputs.feedVolRate : results.FQP
+								}
 								onChange={handleInputChange}
 								placeholder='Enter Vol Rate...'
-								name='FeedVolRate'
+								name='feedVolRate'
+								id='feed-volflow'
 								type='number'
 								className='mb-3'
 							/>
+
 							<ResultComponent
 								labelText='Solid Rate (t/hr)'
 								value={results.FDMS}
@@ -160,13 +180,22 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 								step={0.1}
 							/>
 
-							<ResultComponent
-								labelText={
+							<InputWithLabel
+								label={
 									<>
-										Vol Flow (m<sup>3</sup>/hr)
+										Volumetric Rate (m<sup>3</sup>/hr)
 									</>
 								}
-								value={results.UFQP}
+								value={
+									activeVolFlow === "underflow"
+										? inputs.underVolRate
+										: results.UFQP
+								}
+								onChange={handleInputChange}
+								placeholder='Enter Vol Rate...'
+								name='underVolRate'
+								id='underflow-volflow'
+								type='number'
 								className='mb-3'
 							/>
 							<ResultComponent
@@ -199,13 +228,22 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 								className='mb-3'
 								step={0.1}
 							/>
-							<ResultComponent
-								labelText={
+							<InputWithLabel
+								label={
 									<>
-										Vol Flow (m<sup>3</sup>/hr)
+										Volumetric Rate (m<sup>3</sup>/hr)
 									</>
 								}
-								value={results.OFQP}
+								value={
+									activeVolFlow === "overflow"
+										? inputs.overVolRate
+										: results.OFQP
+								}
+								onChange={handleInputChange}
+								placeholder='Enter Vol Rate...'
+								name='overVolRate'
+								id='overflow-volflow'
+								type='number'
 								className='mb-3'
 							/>
 							<ResultComponent
@@ -221,9 +259,9 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 					</div>
 				</div>
 
-                <div className='space-y-6'>
-						<div className='glass-card p-6'></div>
-					</div>
+				<div className='space-y-6'>
+					<div className='glass-card p-6'></div>
+				</div>
 
 				{/* Formula Explanation */}
 				<div className='glass-card mt-6'>

@@ -7,6 +7,7 @@ export const InputWithLabel = ({
     type = 'text',
     className = '',
     step  = 1,
+    id=""
 }) => {
     return (
         <div className={className}>
@@ -21,10 +22,11 @@ export const InputWithLabel = ({
                 </button>
             </label>
             <input
+                id={id}
                 type={type}
                 className="input input-bordered w-full bg-secondary text-white"
                 value={value}
-                onChange={(e) => onChange(name, e.target.value)}
+                onChange={(e) => onChange(name, e.target.value, e.target.id)}
                 placeholder={placeholder}
                 step={step}
             />
