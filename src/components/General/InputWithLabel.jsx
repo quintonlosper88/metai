@@ -6,6 +6,7 @@ export const InputWithLabel = ({
     name,
     type = 'text',
     className = '',
+    step  = 1,
 }) => {
     return (
         <div className={className}>
@@ -25,6 +26,7 @@ export const InputWithLabel = ({
                 value={value}
                 onChange={(e) => onChange(name, e.target.value)}
                 placeholder={placeholder}
+                step={step}
             />
         </div>
     );

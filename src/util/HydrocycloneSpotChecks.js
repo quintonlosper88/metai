@@ -39,6 +39,8 @@ export class HydroSpotCheck{
         results.FPS = this.calcPercSolidsByWeight(this.feedDensity).toFixed(2)
         results.UFPS = this.calcPercSolidsByWeight(this.underflowDensity).toFixed(2)
         results.OFPS = this.calcPercSolidsByWeight(this.overflowDensity).toFixed(2)
+        results.UFQP = ((results.UFMS/(results.UFPS/100))/this.underflowDensity).toFixed(2)
+        results.OFQP = ((results.OFMS/(results.OFPS/100))/this.overflowDensity).toFixed(2)
 
         return results
     }
@@ -47,13 +49,13 @@ export class HydroSpotCheck{
 }
 
 // Example usage
-const hydroSpotCheck = new HydroSpotCheck(
-    2.650,              // OreDensi            // extensiveVariable
-    139,               // Vol Flow
-    1.621,               // feedDensity (ρf)
-    1.507,               // overflowDensity (ρo)
-    1.992                // underflowDensity (ρu)
-);
+// const hydroSpotCheck = new HydroSpotCheck(
+//     2.650,              // OreDensi            // extensiveVariable
+//     139,               // Vol Flow
+//     1.621,               // feedDensity (ρf)
+//     1.507,               // overflowDensity (ρo)
+//     1.992                // underflowDensity (ρu)
+// );
 
 
-console.log( hydroSpotCheck.Results());
+// console.log( hydroSpotCheck.Results());

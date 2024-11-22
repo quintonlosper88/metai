@@ -3,24 +3,26 @@ import { Calculator, Info, Download, Save, FileText } from "lucide-react";
 import { ResultComponent } from "../../General/ResultComponent";
 import { InputWithLabel } from "../../General/InputWithLabel";
 import { CalculatorHeader } from "../../General/CalculatorHeader";
-
+import { HydroSpotCheck } from "../../../util/HydrocycloneSpotChecks";
 const HydrocycloneSpotChecks = ({ onBack }) => {
 	const [inputs, setInputs] = useState({
-		feedGrade: "",
-		concentrateGrade: "",
-		tailingsGrade: "",
-		feedTons: "",
-		metalUnit: "g/t",
+		oreDensity: "2.65",
+		FeedVolRate: "150",
+		feedDensity: "1.35",
+		overflowDensity: "1.15",
+		underflowDensity: "1.55",
 	});
 
 	const [results, setResults] = useState({
-		recovery: null,
-		upgradeRatio: null,
-		massYield: null,
-		massBalance: {
-			conc: null,
-			tails: null,
-		},
+		split: null,
+		FDMS: null,
+		UFMS: null,
+		OFMS: null,
+		FPS: null,
+		UFPS: null,
+		OFPS: null,
+		UFQP: null,
+		OFQP: null,
 	});
 
 	const handleInputChange = (field, value) => {
@@ -30,19 +32,34 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 		};
 
 		// Convert input strings to numbers and validate
-		const f = parseFloat(newInputs.feedGrade);
-		const c = parseFloat(newInputs.concentrateGrade);
-		const t = parseFloat(newInputs.tailingsGrade);
-		const w = parseFloat(newInputs.feedTons);
+		const feedDensity = parseFloat(newInputs.feedDensity);
+		const overflowDensity = parseFloat(newInputs.overflowDensity);
+		const underflowDensity = parseFloat(newInputs.underflowDensity);
+		const FeedVolRate = parseFloat(newInputs.FeedVolRate);
 		// Only calculate if we have valid numbers
-		if (!isNaN(f) && !isNaN(c) && !isNaN(t)) {
-			const calculator = new TwoProductFormula(f, c, t, w);
-			console.log(calculator);
+		if (
+			!isNaN(feedDensity) &&
+			!isNaN(overflowDensity) &&
+			!isNaN(underflowDensity)
+		) {
+			const calculator = new HydroSpotCheck(
+				2.65,
+				FeedVolRate,
+				feedDensity,
+				overflowDensity,
+				underflowDensity
+			);
+			console.log(calculator.Results());
 			setResults({
-				recovery: calculator.calcRecovery(),
-				upgradeRatio: calculator.calcUpgradeRatio(),
-				massYield: calculator.calcMassYield(),
-				massBalance: calculator.calcMassBalance(),
+				split: calculator.Results().Split,
+				FDMS: calculator.Results().FDMS,
+				UFMS: calculator.Results().UFMS,
+				OFMS: calculator.Results().OFMS,
+				FPS: calculator.Results().FPS,
+				UFPS: calculator.Results().UFPS,
+				OFPS: calculator.Results().OFPS,
+				UFQP: calculator.Results().UFQP,
+				OFQP: calculator.Results().OFQP,
 			});
 		}
 
@@ -77,7 +94,7 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 					]}
 				/>
 
-				<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+				<div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-3'>
 					{/* Input Section */}
 					<div className='space-y-6'>
 						<div className='glass-card p-6'>
@@ -90,12 +107,13 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Slurry SG (t/m<sup>3</sup>)
 									</>
 								}
-								value={inputs.product1Metal1}
+								value={inputs.feedDensity}
 								onChange={handleInputChange}
 								placeholder='Enter Slurry SG...'
-								name='product1Metal1'
+								name='feedDensity'
 								type='number'
 								className='mb-4'
+								step={0.1}
 							/>
 							<InputWithLabel
 								label={
@@ -103,16 +121,21 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Volumetric Rate (m<sup>3</sup>/hr)
 									</>
 								}
-								value={inputs.product1Metal1}
+								value={inputs.FeedVolRate}
 								onChange={handleInputChange}
 								placeholder='Enter Vol Rate...'
-								name='product1Metal1'
+								name='FeedVolRate'
 								type='number'
 								className='mb-3'
 							/>
 							<ResultComponent
 								labelText='Solid Rate (t/hr)'
-								value={results.massBalance.conc}
+								value={results.FDMS}
+								className='mb-3'
+							/>
+							<ResultComponent
+								labelText='Percent Solids (w/w)'
+								value={results.FPS}
 							/>
 						</div>
 					</div>
@@ -128,12 +151,13 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Slurry SG (t/m<sup>3</sup>)
 									</>
 								}
-								value={inputs.product1Metal1}
+								value={inputs.underflowDensity}
 								onChange={handleInputChange}
 								placeholder='Enter Slurry SG...'
-								name='product1Metal1'
+								name='underflowDensity'
 								type='number'
 								className='mb-3'
+								step={0.1}
 							/>
 
 							<ResultComponent
@@ -142,12 +166,17 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Vol Flow (m<sup>3</sup>/hr)
 									</>
 								}
-								value={results.massBalance.conc}
+								value={results.UFQP}
 								className='mb-3'
 							/>
 							<ResultComponent
 								labelText='Solid Rate (t/hr)'
-								value={results.massBalance.conc}
+								value={results.UFMS}
+								className='mb-3'
+							/>
+							<ResultComponent
+								labelText='Percent Solids (w/w)'
+								value={results.UFPS}
 							/>
 						</div>
 					</div>
@@ -162,12 +191,13 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Slurry SG (t/m<sup>3</sup>)
 									</>
 								}
-								value={inputs.product1Metal1}
+								value={inputs.overflowDensity}
 								onChange={handleInputChange}
 								placeholder='Enter Slurry SG...'
-								name='product1Metal1'
+								name='overflowDensity'
 								type='number'
 								className='mb-3'
+								step={0.1}
 							/>
 							<ResultComponent
 								labelText={
@@ -175,16 +205,25 @@ const HydrocycloneSpotChecks = ({ onBack }) => {
 										Vol Flow (m<sup>3</sup>/hr)
 									</>
 								}
-								value={results.massBalance.conc}
+								value={results.OFQP}
 								className='mb-3'
 							/>
 							<ResultComponent
 								labelText='Solid Rate (t/hr)'
-								value={results.massBalance.conc}
+								value={results.OFMS}
+								className='mb-3'
+							/>
+							<ResultComponent
+								labelText='Percent Solids (w/w)'
+								value={results.OFPS}
 							/>
 						</div>
 					</div>
 				</div>
+
+                <div className='space-y-6'>
+						<div className='glass-card p-6'></div>
+					</div>
 
 				{/* Formula Explanation */}
 				<div className='glass-card mt-6'>
