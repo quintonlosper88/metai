@@ -1,18 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart2, 
-  Plus, 
-  Trash2, 
-  Download, 
-  Table, 
+import {
+  BarChart2,
+  Plus,
+  Trash2,
+  Download,
+  Table,
   Info,
-  ArrowLeft 
+  ArrowLeft
 } from 'lucide-react';
 import PSDChart from './PSDChart';
 
 const PSDCalculator = ({ onBack }) => {
   const [fractions, setFractions] = useState([
-    { id: 1, upperSize: '', lowerSize: '', mass: '' }
+    { id: 1, upperSize: '25400', lowerSize: '19050', mass: '0.00' },
+    { id: 2, upperSize: '19050', lowerSize: '12700', mass: '0.00' },
+    { id: 3, upperSize: '12700', lowerSize: '9500', mass: '18.17' },
+    { id: 4, upperSize: '9500', lowerSize: '6700', mass: '41.49' },
+    { id: 5, upperSize: '6700', lowerSize: '4750', mass: '40.76' },
+    { id: 6, upperSize: '4750', lowerSize: '3350', mass: '37.01' },
+    { id: 7, upperSize: '3350', lowerSize: '2360', mass: '38.53' },
+    { id: 8, upperSize: '2360', lowerSize: '1700', mass: '44.14' },
+    { id: 9, upperSize: '1700', lowerSize: '1180', mass: '51.21' },
+    { id: 10, upperSize: '1180', lowerSize: '850', mass: '66.98' },
+    { id: 11, upperSize: '850', lowerSize: '600', mass: '78.83' },
+    { id: 12, upperSize: '600', lowerSize: '425', mass: '100.61' },
+    { id: 13, upperSize: '425', lowerSize: '300', mass: '122.86' },
+    { id: 14, upperSize: '300', lowerSize: '212', mass: '142.11' },
+    { id: 15, upperSize: '212', lowerSize: '150', mass: '143.62' },
+    { id: 16, upperSize: '150', lowerSize: '106', mass: '125.60' },
+    { id: 17, upperSize: '106', lowerSize: '75', mass: '98.97' },
+    { id: 18, upperSize: '75', lowerSize: '53', mass: '73.25' },
+    { id: 19, upperSize: '53', lowerSize: '38', mass: '53.99' },
+    { id: 20, upperSize: '38', lowerSize: '0', mass: '38.98' }
   ]);
 
   const [results, setResults] = useState({
@@ -46,12 +65,12 @@ const PSDCalculator = ({ onBack }) => {
     if (fractions.some(f => !f.upperSize || !f.lowerSize || !f.mass)) return;
 
     // Sort fractions by upper size
-    const sortedFractions = [...fractions].sort((a, b) => 
+    const sortedFractions = [...fractions].sort((a, b) =>
       parseFloat(b.upperSize) - parseFloat(a.upperSize)
     );
 
     // Calculate total mass
-    const totalMass = sortedFractions.reduce((sum, f) => 
+    const totalMass = sortedFractions.reduce((sum, f) =>
       sum + parseFloat(f.mass), 0
     );
 
@@ -107,7 +126,7 @@ const PSDCalculator = ({ onBack }) => {
               </div>
             </div>
             <div className="flex space-x-2">
-              <button 
+              <button
                 onClick={onBack}
                 className="btn btn-ghost btn-sm"
               >
@@ -133,7 +152,7 @@ const PSDCalculator = ({ onBack }) => {
             <div className="glass-card p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-white">Size Fractions</h2>
-                <button 
+                <button
                   className="btn btn-primary btn-sm"
                   onClick={addFraction}
                 >
@@ -178,7 +197,7 @@ const PSDCalculator = ({ onBack }) => {
                         onChange={(e) => updateFraction(index, 'mass', e.target.value)}
                       />
                     </div>
-                    <button 
+                    <button
                       className="btn btn-ghost btn-sm text-red-500"
                       onClick={() => removeFraction(fraction.id)}
                       disabled={fractions.length === 1}
