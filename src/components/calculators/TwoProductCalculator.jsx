@@ -4,6 +4,7 @@ import { TwoProductFormula } from "../../util/TwoProductFormula";
 import { ResultComponent } from "../General/ResultComponent";
 import { InputWithLabel } from "../General/InputWithLabel";
 import { CalculatorHeader } from "../General/CalculatorHeader";
+import { PropertySelect } from "../General/PropertySelect";
 
 const TwoProductCalculator = ({ onBack }) => {
 	const [inputs, setInputs] = useState({
@@ -119,23 +120,17 @@ const TwoProductCalculator = ({ onBack }) => {
 								Input Parameters
 							</h2>
 
-							{/* Unit Selection */}
-							<div className='mb-6'>
-								<label className='block text-sm font-medium text-gray-400 mb-2'>
-									Metal Unit
-								</label>
-								<select
-									className='select select-bordered w-full bg-secondary text-white'
-									value={inputs.metalUnit}
-									onChange={(e) =>
-										handleInputChange("metalUnit", e.target.value)
-									}
-								>
-									<option value='g/t'>g/t</option>
-									<option value='%'>%</option>
-									<option value='ppm'>ppm</option>
-								</select>
-							</div>
+							<PropertySelect
+								label='Metal Unit'
+								value={inputs.metalUnit}
+								onChange={handleInputChange}
+								name='metalUnit'
+								options={[
+									{ value: "g/t", label: "g/t" },
+									{ value: "%", label: "%" },
+									{ value: "ppm", label: "ppm" },
+								]}
+							/>
 
 							{/* Grade Inputs */}
 							<div className='space-y-4'>

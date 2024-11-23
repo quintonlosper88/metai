@@ -108,14 +108,19 @@ export class HydroSpotCheck {
 		);
 	}
 
+
+
 	Results() {
 		const results = {};
 
 		// Calculate mass yield first
-		results.Split = this.calculateMassYieldToUnderflow().toFixed(2);
+		results.Split = 100*this.calculateMassYieldToUnderflow().toFixed(2);
 		results.FPS = this.calcPercSolidsByWeight(this.feedDensity).toFixed(2);
 		results.UFPS = this.calcPercSolidsByWeight(this.underflowDensity).toFixed(2);
 		results.OFPS = this.calcPercSolidsByWeight(this.overflowDensity).toFixed(2);
+        results.FDDL = this.calcDilutionRatio(this.feedDensity);
+        results.UFDL = this.calcDilutionRatio(this.underflowDensity);
+        results.OFDL = this.calcDilutionRatio(this.overflowDensity);
 
 		switch(this.volRateVariable) {
 			case "feed":
@@ -125,6 +130,7 @@ export class HydroSpotCheck {
 				results.FQP = this.VolRate.toFixed(2);
 				results.UFQP = (results.UFMS/(results.UFPS/100)/this.underflowDensity).toFixed(2);
 				results.OFQP = (results.OFMS/(results.OFPS/100)/this.overflowDensity).toFixed(2);
+				results.VSplit = (results.UFQP/results.FQP*100).toFixed(2);
 				break;
 
 			case "underflow":
@@ -134,6 +140,7 @@ export class HydroSpotCheck {
 				results.FQP = (results.FDMS/(results.FPS/100)/this.feedDensity).toFixed(2);
 				results.UFQP = this.VolRate.toFixed(2);
 				results.OFQP = (results.OFMS/(results.OFPS/100)/this.overflowDensity).toFixed(2);
+				results.VSplit = (results.UFQP/results.FQP*100).toFixed(2);
 				break;
 
 			case "overflow":
@@ -143,6 +150,7 @@ export class HydroSpotCheck {
 				results.FQP = (results.FDMS/(results.FPS/100)/this.feedDensity).toFixed(2);
 				results.OFQP = this.VolRate.toFixed(2);
 				results.UFQP = (parseFloat(results.FQP) - parseFloat(results.OFQP)).toFixed(2);
+				results.VSplit = (results.UFQP/results.FQP*100).toFixed(2);
 				break;
 		}
 
