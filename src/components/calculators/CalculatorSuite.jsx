@@ -24,7 +24,8 @@ import PSDCalculator from "./PSDCalculator";
 import SlurryCalculator from "./SlurryCalculator";
 import SolidSGCalculator from "./SolidSGCalculator";
 import BatchFlotationTest from "./BatchFlotationTest";
-import HydrocycloneSpotChecks from "../calculators/classification/HydrocycloneSpotCheck"
+import HydrocycloneSpotChecks from "../calculators/classification/HydrocycloneSpotCheck";
+import WaterPropertiesVisualization from "../calculators/general/waterproperties/WaterPropertiesUtils"
 const CalculatorSuite = () => {
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [selectedCalculator, setSelectedCalculator] = useState(null);
@@ -179,10 +180,10 @@ const CalculatorSuite = () => {
 				{
 					id: "hydrocyclone-spot-checks",
 					name: "Hydrocyclone Spot Check",
-					description: "Perform mass balance around hydrocyclone using dilution ratios.",
-          component: HydrocycloneSpotChecks,
+					description:
+						"Perform mass balance around hydrocyclone using dilution ratios.",
+					component: HydrocycloneSpotChecks,
 				},
-
 			],
 		},
 		{
@@ -228,6 +229,12 @@ const CalculatorSuite = () => {
 					name: "Solid SG Calculator",
 					description: "Calculate sample solid SG using displacement method.",
 					component: SolidSGCalculator,
+				},
+				{
+					id: "water-properties-calculator",
+					name: "Water Properties Calculator",
+					description: "Calculate simple water properties as a function of temperature.",
+					component: WaterPropertiesVisualization,
 				},
 			],
 		},

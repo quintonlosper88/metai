@@ -1,4 +1,4 @@
-class WaterProperties {
+export class WaterProperties {
     constructor(temp) {
         this.temp = temp;
     }
